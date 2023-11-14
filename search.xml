@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>欢迎来到zzx的个人博客</title>
+    <url>/2023/09/25/myblog/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="暂时没想起来写啥，放个表情包吧"><a href="#暂时没想起来写啥，放个表情包吧" class="headerlink" title="暂时没想起来写啥，放个表情包吧"></a>暂时没想起来写啥，放个表情包吧</h2><p><img src="/2023/09/25/myblog/1.jpg" alt="1"></p>
+]]></content>
+      <categories>
+        <category>Hexo</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>frp通过自定义域名访问内网的 Web 服务</title>
+    <url>/2023/11/14/frp%E7%9A%84%E4%BD%BF%E7%94%A8/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h4 id="文档地址"><a href="#文档地址" class="headerlink" title="文档地址"></a>文档地址</h4><p>官网地址：<a href="https://github.com/fatedier/frp">https://github.com/fatedier/frp</a></p>
+<p>完整文档：<a href="https://gofrp.org/zh-cn/">https://gofrp.org/zh-cn/</a></p>
+<h4 id="官方示例"><a href="#官方示例" class="headerlink" title="官方示例"></a>官方示例</h4><ol>
+<li><p><strong>配置 frps.toml</strong></p>
+<p>在 frps.toml 文件中添加以下内容，以指定 HTTP 请求的监听端口为 8080：</p>
+<pre class="line-numbers language-toml" data-language="toml"><code class="language-toml"><span class="token key property">bindPort</span> <span class="token punctuation">=</span> <span class="token number">7000</span>
+<span class="token key property">vhostHTTPPort</span> <span class="token punctuation">=</span> <span class="token number">8080</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>如果需要配置 HTTPS 代理，还需要设置 <code>vhostHTTPSPort</code>。</p>
+</li>
+<li><p><strong>配置 frpc.toml</strong></p>
+<p>在 frpc.toml 文件中添加以下内容，确保设置了正确的服务器 IP 地址、本地 Web 服务监听端口和自定义域名：</p>
+<pre class="line-numbers language-toml" data-language="toml"><code class="language-toml"><span class="token key property">serverAddr</span> <span class="token punctuation">=</span> <span class="token string">"x.x.x.x"</span>
+<span class="token key property">serverPort</span> <span class="token punctuation">=</span> <span class="token number">7000</span>
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token table class-name">proxies</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+<span class="token key property">name</span> <span class="token punctuation">=</span> <span class="token string">"web"</span>
+<span class="token key property">type</span> <span class="token punctuation">=</span> <span class="token string">"http"</span>
+<span class="token key property">localPort</span> <span class="token punctuation">=</span> <span class="token number">80</span>
+<span class="token key property">customDomains</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"www.yourdomain.com"</span><span class="token punctuation">]</span>
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token table class-name">proxies</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+<span class="token key property">name</span> <span class="token punctuation">=</span> <span class="token string">"web2"</span>
+<span class="token key property">type</span> <span class="token punctuation">=</span> <span class="token string">"http"</span>
+<span class="token key property">localPort</span> <span class="token punctuation">=</span> <span class="token number">8080</span>
+<span class="token key property">customDomains</span> <span class="token punctuation">=</span> <span class="token punctuation">[</span><span class="token string">"www.yourdomain2.com"</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li><p><strong>启动 frps 和 frpc</strong></p>
+<p>启动服务器：<code>./frps -c ./frps.toml</code></p>
+<p>启动客户端：<code>./frpc -c ./frpc.toml</code></p>
+</li>
+<li><p><strong>域名解析</strong></p>
+<p>将 <code>www.yourdomain.com</code> 和 <code>www.yourdomain2.com</code> 的域名 A 记录解析到服务器的 IP 地址 <code>x.x.x.x</code>。如果服务器已经有对应的域名，您还可以将 CNAME 记录解析到原始域名。另外，通过修改 HTTP 请求的 Host 字段也可以实现相同的效果。</p>
+</li>
+<li><p><strong>通过浏览器访问</strong></p>
+<p>使用浏览器访问 <code>http://www.yourdomain.com:8080</code> 即可访问内网机器上的 80 端口服务，访问 <code>http://www.yourdomain2.com:8080</code> 可以访问内网机器上的 8080 端口服务。</p>
+</li>
+</ol>
+<h4 id="个人使用配置"><a href="#个人使用配置" class="headerlink" title="个人使用配置"></a>个人使用配置</h4><h5 id="服务端配置："><a href="#服务端配置：" class="headerlink" title="服务端配置："></a>服务端配置：</h5><p><img src="/2023/11/14/frp%E7%9A%84%E4%BD%BF%E7%94%A8/image-20231114085240657.png" alt="image-20231114085240657"></p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json">bindPort = <span class="token number">7000</span>
+vhostHTTPPort = <span class="token number">8000</span>
+token = <span class="token string">"token"</span>
+
+<span class="token punctuation">[</span>webServer<span class="token punctuation">]</span>
+port = <span class="token number">8080</span>
+user = <span class="token string">"用户名"</span>
+password = <span class="token string">"密码"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h5 id="客户端配置："><a href="#客户端配置：" class="headerlink" title="客户端配置："></a>客户端配置：</h5><p><img src="/2023/11/14/frp%E7%9A%84%E4%BD%BF%E7%94%A8/image-20231114085040217.png" alt="image-20231114085040217"></p>
+<pre class="line-numbers language-json" data-language="json"><code class="language-json">serverAddr = <span class="token string">"公网IP"</span>
+serverPort = <span class="token number">7000</span>
+token = <span class="token string">"token"</span>
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span>proxies<span class="token punctuation">]</span><span class="token punctuation">]</span>
+name = <span class="token string">"name2"</span>
+type = <span class="token string">"http"</span>
+localPort = <span class="token number">8181</span>
+remotePort = <span class="token number">8000</span>
+customDomains = <span class="token punctuation">[</span><span class="token string">"域名1"</span><span class="token punctuation">]</span>
+
+<span class="token punctuation">[</span><span class="token punctuation">[</span>proxies<span class="token punctuation">]</span><span class="token punctuation">]</span>
+name = <span class="token string">"name1"</span>
+type = <span class="token string">"http"</span>
+localPort = <span class="token number">8182</span>
+remotePort = <span class="token number">8000</span>
+customDomains = <span class="token punctuation">[</span><span class="token string">"域名2"</span><span class="token punctuation">]</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>访问 <code>域名1:8000</code>即可访问本地 8181 的端口服务</p>
+<p>访问 <code>域名2:8000</code>即可访问本地 8182 的端口服务</p>
+<h4 id="使用注意"><a href="#使用注意" class="headerlink" title="使用注意"></a>使用注意</h4><ul>
+<li>提前对使用的端口（ <code>bindPort</code> 和 <code>vhostHTTPPort</code> ）进行安全组配置，端口号可修改</li>
+<li>配置完成后服务端和客户端都启动才生效</li>
+<li>客户端<code>remotePort</code>与服务端<code>vhostHTTPPort</code>保持一致</li>
+<li>客户端<code>localPort</code>的端口服务一定要启动</li>
+<li>无需配置 nginx</li>
+</ul>
+]]></content>
+      <categories>
+        <category>frp</category>
+      </categories>
+      <tags>
+        <tag>开源项目</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于Vue2+element-ui 的树形选择器</title>
+    <url>/2023/09/28/20230928/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h4 id="组件代码"><a href="#组件代码" class="headerlink" title="组件代码"></a>组件代码</h4><pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;!-- 树状选择器 --&gt;
+&lt;template&gt;
+  &lt;el-popover
+    ref&#x3D;&quot;popover&quot;
+    placement&#x3D;&quot;bottom-start&quot;
+    trigger&#x3D;&quot;click&quot;
+    @show&#x3D;&quot;onShowPopover&quot;
+    @hide&#x3D;&quot;onHidePopover&quot;
+  &gt;
+    &lt;el-tree
+      ref&#x3D;&quot;tree&quot;
+      :style&#x3D;&quot;&#96;min-width: $&#123;treeWidth&#125;;max-height:$&#123;treeHeight&#125;&#96;&quot;
+      :data&#x3D;&quot;data&quot;
+      :props&#x3D;&quot;props&quot;
+      :filter-node-method&#x3D;&quot;filterNode&quot;
+      :default-expand-all&#x3D;&quot;DefaultExpandAll&quot;
+      :node-key&#x3D;&quot;props.value&quot;
+      placeholder&#x3D;&quot;选择部门&quot;
+      class&#x3D;&quot;select-tree&quot;
+      highlight-current
+      @node-click&#x3D;&quot;onClickNode&quot;
+    &#x2F;&gt;
+    &lt;el-input
+      slot&#x3D;&quot;reference&quot;
+      ref&#x3D;&quot;input&quot;
+      v-model&#x3D;&quot;labelModel&quot;
+      :style&#x3D;&quot;&#96;width: $&#123;width&#125;px&#96;&quot;
+      :class&#x3D;&quot;&#123; rotate: showStatus &#125;&quot;
+      :placeholder&#x3D;&quot;placeholder&quot;
+      :clearable &#x3D; &quot;clearable&quot;
+      :size&#x3D;&quot;size&quot;
+      suffix-icon&#x3D;&quot;el-icon-arrow-down&quot;
+    &#x2F;&gt;
+  &lt;&#x2F;el-popover&gt;
+&lt;&#x2F;template&gt;
+
+&lt;script&gt;
+export default &#123;
+  name: &#39;DepartTree&#39;,
+  &#x2F;&#x2F; 设置绑定参数
+  model: &#123;
+    prop: &#39;value&#39;,
+    event: &#39;selected&#39;
+  &#125;,
+  props: &#123;
+    &#x2F;&#x2F; 接收绑定参数
+    value: &#123;
+      type: String,
+      default: &#39;&#39;
+    &#125;,
+    &#x2F;&#x2F; 输入框宽度
+    width: &#123;
+      type: String,
+      default: &#39;&#39;
+    &#125;,
+    &#x2F;&#x2F; 树形菜单高度
+    height: &#123;
+      type: String,
+      default: &#39;&#39;
+    &#125;,
+    &#x2F;&#x2F; 选项数据
+    options: &#123;
+      type: Array,
+      required: true
+    &#125;,
+    size: &#123;
+      type: String,
+      default: &#39;&#39;
+    &#125;,
+    &#x2F;&#x2F; 输入框占位符
+    placeholder: &#123;
+      type: String,
+      required: false,
+      default: &#39;请选择&#39;
+    &#125;,
+    &#x2F;&#x2F; 树节点配置选项
+    props: &#123;
+      type: Object,
+      required: false,
+      default: () &#x3D;&gt; (&#123;
+        parent: &#39;parentId&#39;,
+        value: &#39;value&#39;,
+        label: &#39;label&#39;,
+        children: &#39;children&#39;
+      &#125;)
+    &#125;,
+    &#x2F;&#x2F; 是否可清空
+    clearable: &#123;
+      type: Boolean,
+      default: true
+    &#125;,
+    &#x2F;&#x2F; 默认展开所有节点
+    DefaultExpandAll: &#123;
+      type: Boolean,
+      default: true
+    &#125;
+  &#125;,
+  data() &#123;
+    return &#123;
+      &#x2F;&#x2F; 树状菜单显示状态
+      showStatus: false,
+      &#x2F;&#x2F; 菜单宽度
+      treeWidth: &#39;auto&#39;,
+      &#x2F;&#x2F; 菜单高度
+      treeHeight: &#39;auto&#39;,
+      &#x2F;&#x2F; 输入框显示值
+      labelModel: &#39;&#39;,
+      &#x2F;&#x2F; 实际请求传值
+      valueModel: &#39;0&#39;
+    &#125;
+  &#125;,
+  computed: &#123;
+    &#x2F;&#x2F; 是否为树状结构数据
+    dataType() &#123;
+      const jsonStr &#x3D; JSON.stringify(this.options)
+      return jsonStr.indexOf(this.props.children) !&#x3D;&#x3D; -1
+    &#125;,
+    &#x2F;&#x2F; 若非树状结构，则转化为树状结构数据
+    data() &#123;
+      return this.dataType ? this.options : this.switchTree()
+    &#125;
+  &#125;,
+  watch: &#123;
+    labelModel(val) &#123;
+      if (!val) &#123;
+        this.valueModel &#x3D; &#39;&#39;
+      &#125; else &#123;
+        this.$refs.tree.filter(val)
+      &#125;
+    &#125;,
+    value(val) &#123;
+      this.labelModel &#x3D; this.queryTree(this.data, val)
+      this.valueModel &#x3D; val
+      this.$refs.tree.setCurrentKey(val)
+      this.$emit(&#39;change&#39;, &#123; label: this.labelModel, value: this.valueModel &#125;)
+    &#125;
+  &#125;,
+  created() &#123;
+    &#x2F;&#x2F; 检测输入框原有值并显示对应 label
+    if (this.value) &#123;
+      this.labelModel &#x3D; this.queryTree(this.data, this.value)
+    &#125;
+    &#x2F;&#x2F; 获取输入框宽度同步至树状菜单宽度
+    this.$nextTick(() &#x3D;&gt; &#123;
+      this.treeWidth &#x3D; &#96;$&#123;
+        (this.width || this.$refs.input.$refs.input.clientWidth) - 24
+      &#125;px&#96;
+      this.treeHeight &#x3D; this.height ? this.height + &#39;px&#39; : &#39;auto&#39;
+    &#125;)
+  &#125;,
+  methods: &#123;
+    &#x2F;&#x2F; 单击节点
+    onClickNode(node) &#123;
+      this.labelModel &#x3D; node[this.props.label]
+      this.valueModel &#x3D; node[this.props.value]
+      this.onCloseTree()
+    &#125;,
+    &#x2F;&#x2F; 偏平数组转化为树状层级结构
+    switchTree() &#123;
+      return this.cleanChildren(this.buildTree(this.options, &#39;0&#39;))
+    &#125;,
+    &#x2F;&#x2F; 隐藏树状菜单
+    onCloseTree() &#123;
+      this.$refs.popover.showPopper &#x3D; false
+    &#125;,
+    &#x2F;&#x2F; 显示时触发
+    onShowPopover() &#123;
+      this.showStatus &#x3D; true
+      this.$refs.tree.filter(false)
+    &#125;,
+    &#x2F;&#x2F; 隐藏时触发
+    onHidePopover() &#123;
+      this.showStatus &#x3D; false
+      this.$emit(&#39;selected&#39;, this.valueModel)
+    &#125;,
+    &#x2F;&#x2F; 树节点过滤方法
+    filterNode(query, data) &#123;
+      if (!query) return true
+      return data[this.props.label].indexOf(query) !&#x3D;&#x3D; -1
+    &#125;,
+    &#x2F;&#x2F; 搜索树状数据中的 ID
+    queryTree(tree, id) &#123;
+      let stark &#x3D; []
+      stark &#x3D; stark.concat(tree)
+      while (stark.length) &#123;
+        const temp &#x3D; stark.shift()
+        if (temp[this.props.children]) &#123;
+          stark &#x3D; stark.concat(temp[this.props.children])
+        &#125;
+        if (temp[this.props.value] &#x3D;&#x3D;&#x3D; id) &#123;
+          return temp[this.props.label]
+        &#125;
+      &#125;
+      return &#39;&#39;
+    &#125;,
+    &#x2F;&#x2F; 将一维的扁平数组转换为多层级对象
+    buildTree(data, id &#x3D; &#39;0&#39;) &#123;
+      const fa &#x3D; (parentId) &#x3D;&gt; &#123;
+        const temp &#x3D; []
+        for (let i &#x3D; 0; i &lt; data.length; i++) &#123;
+          const n &#x3D; data[i]
+          if (n[this.props.parent] &#x3D;&#x3D;&#x3D; parentId) &#123;
+            n.children &#x3D; fa(n.rowGuid)
+            temp.push(n)
+          &#125;
+        &#125;
+        return temp
+      &#125;
+      return fa(id)
+    &#125;,
+    &#x2F;&#x2F; 清除空 children项
+    cleanChildren(data) &#123;
+      const fa &#x3D; (list) &#x3D;&gt; &#123;
+        list.map((e) &#x3D;&gt; &#123;
+          if (e.children.length) &#123;
+            fa(e.children)
+          &#125; else &#123;
+            delete e.children
+          &#125;
+          return e
+        &#125;)
+        return list
+      &#125;
+      return fa(data)
+    &#125;
+  &#125;
+&#125;
+&lt;&#x2F;script&gt;
+
+&lt;style&gt;
+.el-input.el-input--suffix &#123;
+  cursor: pointer;
+  overflow: hidden;
+&#125;
+.el-input.el-input--suffix.rotate .el-input__suffix &#123;
+  transform: rotate(180deg);
+&#125;
+.select-tree &#123;
+  max-height: 350px;
+  overflow-y: scroll;
+&#125;
+&#x2F;* 菜单滚动条 *&#x2F;
+.select-tree::-webkit-scrollbar &#123;
+  z-index: 11;
+  width: 6px;
+&#125;
+.select-tree::-webkit-scrollbar-track,
+.select-tree::-webkit-scrollbar-corner &#123;
+  background: #fff;
+&#125;
+.select-tree::-webkit-scrollbar-thumb &#123;
+  border-radius: 5px;
+  width: 6px;
+  background: #b4bccc;
+&#125;
+.select-tree::-webkit-scrollbar-track-piece &#123;
+  background: #fff;
+  width: 6px;
+&#125;
+&lt;&#x2F;style&gt;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>代码练习</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>代码</tag>
+        <tag>vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>歌词匹配效果</title>
+    <url>/2023/09/27/%E6%AD%8C%E8%AF%8D%E6%BB%9A%E5%8A%A8%E6%95%88%E6%9E%9C/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h4 id="音乐歌词匹配滚动效果"><a href="#音乐歌词匹配滚动效果" class="headerlink" title="音乐歌词匹配滚动效果"></a>音乐歌词匹配滚动效果</h4><h5 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h5><p><img src="/2023/09/27/%E6%AD%8C%E8%AF%8D%E6%BB%9A%E5%8A%A8%E6%95%88%E6%9E%9C/music.png" alt="music"></p>
+<h5 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h5><pre class="line-numbers language-css" data-language="css"><code class="language-css"><span class="token selector">*</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">margin</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+  <span class="token property">padding</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">body</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">background</span><span class="token punctuation">:</span> #000<span class="token punctuation">;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> #666<span class="token punctuation">;</span>
+  <span class="token property">text-align</span><span class="token punctuation">:</span> center<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">audio</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">width</span><span class="token punctuation">:</span> 450px<span class="token punctuation">;</span>
+  <span class="token property">margin</span><span class="token punctuation">:</span> 30px 0<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token selector">.container</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">height</span><span class="token punctuation">:</span> 420px<span class="token punctuation">;</span>
+  <span class="token property">overflow</span><span class="token punctuation">:</span> hidden<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.container ul</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">transition</span><span class="token punctuation">:</span> 0.6s<span class="token punctuation">;</span>
+  <span class="token property">list-style</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.container li</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">height</span><span class="token punctuation">:</span> 30px<span class="token punctuation">;</span>
+  <span class="token property">line-height</span><span class="token punctuation">:</span> 30px<span class="token punctuation">;</span>
+  <span class="token property">transition</span><span class="token punctuation">:</span> 0.2s<span class="token punctuation">;</span>
+  <span class="token property">list-style</span><span class="token punctuation">:</span> none<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token selector">.container li.active</span> <span class="token punctuation">&#123;</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> #fff<span class="token punctuation">;</span>
+  <span class="token property">transform</span><span class="token punctuation">:</span> <span class="token function">scale</span><span class="token punctuation">(</span>1.2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>viewport<span class="token punctuation">"</span></span> <span class="token attr-name">content</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>width=device-width, initial-scale=1.0<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>shortcut icon<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./assets/favicon.ico<span class="token punctuation">"</span></span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>image/x-icon<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>我想(remix) - 法老<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>link</span> <span class="token attr-name">rel</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>stylesheet<span class="token punctuation">"</span></span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./css/index.css<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>audio</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./assets/music.mp3<span class="token punctuation">"</span></span> <span class="token attr-name">controls</span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>audio</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>container<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+      <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>ul</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>lrc-list<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>ul</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./js/data.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>./js/index.js<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">/**
+ * 解析歌词字符串
+ * 得到一个歌词的对象数组
+ * 每个歌词对象
+ * &#123;time：开始时间，word：歌词内容&#125;
+ */</span>
+<span class="token keyword">function</span> <span class="token function">parseLrc</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> lines <span class="token operator">=</span> lrc<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">let</span> result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token keyword">in</span> lines<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> str <span class="token operator">=</span> lines<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> timeStr <span class="token operator">=</span> <span class="token function">timeToNum</span><span class="token punctuation">(</span>str<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"]"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"["</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> obj <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+      <span class="token literal-property property">time</span><span class="token operator">:</span> timeStr<span class="token punctuation">,</span>
+      <span class="token literal-property property">words</span><span class="token operator">:</span> str<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">"]"</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    result<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">/**
+ * 时间解析成数字
+ */</span>
+<span class="token keyword">function</span> <span class="token function">timeToNum</span><span class="token punctuation">(</span><span class="token parameter">time</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">const</span> parts <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">":"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>parts<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">-</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">60</span> <span class="token operator">+</span> <span class="token punctuation">(</span>parts<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">/**
+ * 计算出当前歌词下标
+ * @param &#123;*&#125; data
+ */</span>
+<span class="token keyword">function</span> <span class="token function">findIndex</span><span class="token punctuation">(</span>data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">&#123;</span> <span class="token literal-property property">time</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token literal-property property">words</span><span class="token operator">:</span> <span class="token string">""</span> <span class="token punctuation">&#125;</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> currentTime <span class="token operator">=</span> doms<span class="token punctuation">.</span>audio<span class="token punctuation">.</span>currentTime<span class="token punctuation">;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> i <span class="token keyword">in</span> data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>time <span class="token operator">></span> currentTime<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+      <span class="token keyword">return</span> i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">/**
+ * 设置高亮
+ * @param &#123;&#125; index
+ */</span>
+<span class="token keyword">function</span> <span class="token function">highLightword</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> index <span class="token operator">=</span> <span class="token function">findIndex</span><span class="token punctuation">(</span>lrcData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">let</span> offset <span class="token operator">=</span> liHeight <span class="token operator">*</span> index <span class="token operator">+</span> liHeight <span class="token operator">/</span> <span class="token number">2</span> <span class="token operator">-</span> containerHeight <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>offset <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    offset <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span>style<span class="token punctuation">.</span>transform <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">translateY(-</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">$&#123;</span>offset<span class="token interpolation-punctuation punctuation">&#125;</span></span><span class="token string">px)</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+  <span class="token keyword">let</span> li <span class="token operator">=</span> doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">".active"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  li <span class="token operator">&amp;&amp;</span> li<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span><span class="token string">"active"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  li <span class="token operator">=</span> doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span>children<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  li <span class="token operator">&amp;&amp;</span> li<span class="token punctuation">.</span>classList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"active"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">/**
+ * 加载歌词
+ */</span>
+<span class="token keyword">function</span> <span class="token function">createLi</span><span class="token punctuation">(</span><span class="token parameter">lrcData</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+  <span class="token keyword">let</span> fragment <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createDocumentFragment</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> item <span class="token keyword">of</span> lrcData<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">let</span> li <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">"li"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    li<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> item<span class="token punctuation">.</span>words<span class="token punctuation">;</span>
+    fragment<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>li<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span>
+  doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>fragment<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">let</span> lrcData <span class="token operator">=</span> <span class="token function">parseLrc</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">let</span> doms <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+  <span class="token literal-property property">audio</span><span class="token operator">:</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"audio"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">ul</span><span class="token operator">:</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">".lrc-list"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">container</span><span class="token operator">:</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">".container"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token function">createLi</span><span class="token punctuation">(</span>lrcData<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">let</span> containerHeight <span class="token operator">=</span> doms<span class="token punctuation">.</span>container<span class="token punctuation">.</span>clientHeight<span class="token punctuation">;</span>
+<span class="token keyword">let</span> liHeight <span class="token operator">=</span> doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span>children<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>clientHeight<span class="token punctuation">;</span>
+<span class="token keyword">let</span> maxOffset <span class="token operator">=</span> doms<span class="token punctuation">.</span>ul<span class="token punctuation">.</span>clientHeight <span class="token operator">-</span> containerHeight<span class="token punctuation">;</span>
+doms<span class="token punctuation">.</span>audio<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">"timeupdate"</span><span class="token punctuation">,</span> highLightword<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>代码练习</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>代码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>浏览器的渲染</title>
+    <url>/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%B8%B2%E6%9F%93/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="浏览器是如何渲染页面的？"><a href="#浏览器是如何渲染页面的？" class="headerlink" title="浏览器是如何渲染页面的？"></a>浏览器是如何渲染页面的？</h2><p>当浏览器的网络线程收到 HTML 文档后，会产生一个渲染任务，并将其传递给渲染主线程的消息队列。</p>
+<p>在事件循环机制的作用下，渲染主线程取出消息队列中的渲染任务，开启渲染流程。</p>
+<hr>
+<p>整个渲染流程分为多个阶段，分别是： HTML 解析、样式计算、布局、分层、绘制、分块、光栅化、画</p>
+<p>每个阶段都有明确的输入输出，上一个阶段的输出会成为下一个阶段的输入。</p>
+<p>这样，整个渲染流程就形成了一套组织严密的生产流水线。</p>
+<hr>
+<p>渲染的第一步是<strong>解析 HTML</strong>。</p>
+<p>解析过程中遇到 CSS 解析 CSS，遇到 JS 执行 JS。为了提高解析效率，浏览器在开始解析前，会启动一个预解析的线程，率先下载 HTML 中的外部 CSS 文件和 外部的 JS 文件。】</p>
+<p>如果主线程解析到<code>link</code>位置，此时外部的 CSS 文件还没有下载解析好，主线程不会等待，继续解析后续的 HTML。这是因为下载和解析 CSS 的工作是在预解析线程中进行的。这就是 CSS 不会阻塞 HTML 解析的根本原因。</p>
+<p>如果主线程解析到<code>script</code>位置，会停止解析 HTML，转而等待 JS 文件下载好，并将全局代码解析执行完成后，才能继续解析 HTML。这是因为 JS 代码的执行过程可能会修改当前的 DOM 树，所以 DOM 树的生成必须暂停。这就是 JS 会阻塞 HTML 解析的根本原因。</p>
+<p>第一步完成后，会得到 DOM 树和 CSSOM 树，浏览器的默认样式、内部样式、外部样式、行内样式均会包含在 CSSOM 树中。</p>
+<hr>
+<p>渲染的下一步是<strong>样式计算</strong>。</p>
+<p>主线程会遍历得到的 DOM 树，依次为树中的每个节点计算出它最终的样式，称之为 Computed Style。</p>
+<p>在这一过程中，很多预设值会变成绝对值，比如<code>red</code>会变成<code>rgb(255,0,0)</code>；相对单位会变成绝对单位，比如<code>em</code>会变成<code>px</code></p>
+<p>这一步完成后，会得到一棵带有样式的 DOM 树。</p>
+<hr>
+<p>接下来是<strong>布局</strong>，布局完成后会得到布局树。</p>
+<p>布局阶段会依次遍历 DOM 树的每一个节点，计算每个节点的几何信息。例如节点的宽高、相对包含块的位置。</p>
+<p>大部分时候，DOM 树和布局树并非一一对应。</p>
+<p>比如<code>display:none</code>的节点没有几何信息，因此不会生成到布局树；又比如使用了伪元素选择器，虽然 DOM 树中不存在这些伪元素节点，但它们拥有几何信息，所以会生成到布局树中。还有匿名行盒、匿名块盒等等都会导致 DOM 树和布局树无法一一对应。</p>
+<hr>
+<p>下一步是<strong>分层</strong></p>
+<p>主线程会使用一套复杂的策略对整个布局树中进行分层。</p>
+<p>分层的好处在于，将来某一个层改变后，仅会对该层进行后续处理，从而提升效率。</p>
+<p>滚动条、堆叠上下文、transform、opacity 等样式都会或多或少的影响分层结果，也可以通过<code>will-change</code>属性更大程度的影响分层结果。</p>
+<hr>
+<p>再下一步是<strong>绘制</strong></p>
+<p>主线程会为每个层单独产生绘制指令集，用于描述这一层的内容该如何画出来。</p>
+<hr>
+<p>完成绘制后，主线程将每个图层的绘制信息提交给合成线程，剩余工作将由合成线程完成。</p>
+<p>合成线程首先对每个图层进行分块，将其划分为更多的小区域。</p>
+<p>它会从线程池中拿取多个线程来完成分块工作。</p>
+<hr>
+<p>分块完成后，进入<strong>光栅化</strong>阶段。</p>
+<p>合成线程会将块信息交给 GPU 进程，以极高的速度完成光栅化。</p>
+<p>GPU 进程会开启多个线程来完成光栅化，并且优先处理靠近视口区域的块。</p>
+<p>光栅化的结果，就是一块一块的位图</p>
+<hr>
+<p>最后一个阶段就是<strong>画</strong>了</p>
+<p>合成线程拿到每个层、每个块的位图后，生成一个个「指引（quad）」信息。</p>
+<p>指引会标识出每个位图应该画到屏幕的哪个位置，以及会考虑到旋转、缩放等变形。</p>
+<p>变形发生在合成线程，与渲染主线程无关，这就是<code>transform</code>效率高的本质原因。</p>
+<p>合成线程会把 quad 提交给 GPU 进程，由 GPU 进程产生系统调用，提交给 GPU 硬件，完成最终的屏幕成像。</p>
+<h2 id="什么是-reflow？"><a href="#什么是-reflow？" class="headerlink" title="什么是 reflow？"></a>什么是 reflow？</h2><p>reflow 的本质就是重新计算 layout 树。</p>
+<p>当进行了会影响布局树的操作后，需要重新计算布局树，会引发 layout。</p>
+<p>为了避免连续的多次操作导致布局树反复计算，浏览器会合并这些操作，当 JS 代码全部完成后再进行统一计算。所以，改动属性造成的 reflow 是异步完成的。</p>
+<p>也同样因为如此，当 JS 获取布局属性时，就可能造成无法获取到最新的布局信息。</p>
+<p>浏览器在反复权衡下，最终决定获取属性立即 reflow。</p>
+<h2 id="什么是-repaint？"><a href="#什么是-repaint？" class="headerlink" title="什么是 repaint？"></a>什么是 repaint？</h2><p>repaint 的本质就是重新根据分层信息计算了绘制指令。</p>
+<p>当改动了可见样式后，就需要重新计算，会引发 repaint。</p>
+<p>由于元素的布局信息也属于可见样式，所以 reflow 一定会引起 repaint。</p>
+<h2 id="为什么-transform-的效率高？"><a href="#为什么-transform-的效率高？" class="headerlink" title="为什么 transform 的效率高？"></a>为什么 transform 的效率高？</h2><p>因为 transform 既不会影响布局也不会影响绘制指令，它影响的只是渲染流程的最后一个「draw」阶段</p>
+<p>由于 draw 阶段在合成线程中，所以 transform 的变化几乎不会影响渲染主线程。反之，渲染主线程无论如何忙碌，也不会影响 transform 的变化。</p>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>html</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>浏览器</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>浏览器事件循环</title>
+    <url>/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script><h1 id="事件循环"><a href="#事件循环" class="headerlink" title="事件循环"></a>事件循环</h1><h2 id="浏览器的进程模型"><a href="#浏览器的进程模型" class="headerlink" title="浏览器的进程模型"></a>浏览器的进程模型</h2><h3 id="何为进程？"><a href="#何为进程？" class="headerlink" title="何为进程？"></a>何为进程？</h3><p>程序运行需要有它自己专属的内存空间，可以把这块内存空间简单的理解为进程</p>
+<img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208092057573.png" alt="image-20220809205743532" style="zoom:50%;">
+
+<p>每个应用至少有一个进程，进程之间相互独立，即使要通信，也需要双方同意。</p>
+<h3 id="何为线程？"><a href="#何为线程？" class="headerlink" title="何为线程？"></a>何为线程？</h3><p>有了进程后，就可以运行程序的代码了。</p>
+<p>运行代码的「人」称之为「线程」。</p>
+<p>一个进程至少有一个线程，所以在进程开启后会自动创建一个线程来运行代码，该线程称之为主线程。</p>
+<p>如果程序需要同时执行多块代码，主线程就会启动更多的线程来执行代码，所以一个进程中可以包含多个线程。</p>
+<p><img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208092108499.png" alt="image-20220809210859457"></p>
+<h3 id="浏览器有哪些进程和线程？"><a href="#浏览器有哪些进程和线程？" class="headerlink" title="浏览器有哪些进程和线程？"></a>浏览器有哪些进程和线程？</h3><p><strong>浏览器是一个多进程多线程的应用程序</strong></p>
+<p>浏览器内部工作极其复杂。</p>
+<p>为了避免相互影响，为了减少连环崩溃的几率，当启动浏览器后，它会自动启动多个进程。</p>
+<p><img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208092131410.png" alt="image-20220809213152371"></p>
+<blockquote>
+<p>可以在浏览器的任务管理器中查看当前的所有进程</p>
+</blockquote>
+<p>其中，最主要的进程有：</p>
+<ol>
+<li><p>浏览器进程</p>
+<p>主要负责界面显示、用户交互、子进程管理等。浏览器进程内部会启动多个线程处理不同的任务。</p>
+</li>
+<li><p>网络进程</p>
+<p>负责加载网络资源。网络进程内部会启动多个线程来处理不同的网络任务。</p>
+</li>
+<li><p><strong>渲染进程</strong>（本节课重点讲解的进程）</p>
+<p>渲染进程启动后，会开启一个<strong>渲染主线程</strong>，主线程负责执行 HTML、CSS、JS 代码。</p>
+<p>默认情况下，浏览器会为每个标签页开启一个新的渲染进程，以保证不同的标签页之间不相互影响。</p>
+<blockquote>
+<p>将来该默认模式可能会有所改变，有兴趣的同学可参见<a href="https://chromium.googlesource.com/chromium/src/+/main/docs/process_model_and_site_isolation.md#Modes-and-Availability">chrome 官方说明文档</a></p>
+</blockquote>
+</li>
+</ol>
+<h2 id="渲染主线程是如何工作的？"><a href="#渲染主线程是如何工作的？" class="headerlink" title="渲染主线程是如何工作的？"></a>渲染主线程是如何工作的？</h2><p>渲染主线程是浏览器中最繁忙的线程，需要它处理的任务包括但不限于：</p>
+<ul>
+<li>解析 HTML</li>
+<li>解析 CSS</li>
+<li>计算样式</li>
+<li>布局</li>
+<li>处理图层</li>
+<li>每秒把页面画 60 次</li>
+<li>执行全局 JS 代码</li>
+<li>执行事件处理函数</li>
+<li>执行计时器的回调函数</li>
+<li>……</li>
+</ul>
+<blockquote>
+<p>思考题：为什么渲染进程不适用多个线程来处理这些事情？</p>
+</blockquote>
+<p>要处理这么多的任务，主线程遇到了一个前所未有的难题：如何调度任务？</p>
+<p>比如：</p>
+<ul>
+<li>我正在执行一个 JS 函数，执行到一半的时候用户点击了按钮，我该立即去执行点击事件的处理函数吗？</li>
+<li>我正在执行一个 JS 函数，执行到一半的时候某个计时器到达了时间，我该立即去执行它的回调吗？</li>
+<li>浏览器进程通知我“用户点击了按钮”，与此同时，某个计时器也到达了时间，我应该处理哪一个呢？</li>
+<li>……</li>
+</ul>
+<p>渲染主线程想出了一个绝妙的主意来处理这个问题：排队</p>
+<p><img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208092230847.png" alt="image-20220809223027806"></p>
+<ol>
+<li>在最开始的时候，渲染主线程会进入一个无限循环</li>
+<li>每一次循环会检查消息队列中是否有任务存在。如果有，就取出第一个任务执行，执行完一个后进入下一次循环；如果没有，则进入休眠状态。</li>
+<li>其他所有线程（包括其他进程的线程）可以随时向消息队列添加任务。新任务会加到消息队列的末尾。在添加新任务时，如果主线程是休眠状态，则会将其唤醒以继续循环拿取任务</li>
+</ol>
+<p>这样一来，就可以让每个任务有条不紊的、持续的进行下去了。</p>
+<p><strong>整个过程，被称之为事件循环（消息循环）</strong></p>
+<h2 id="若干解释"><a href="#若干解释" class="headerlink" title="若干解释"></a>若干解释</h2><h3 id="何为异步？"><a href="#何为异步？" class="headerlink" title="何为异步？"></a>何为异步？</h3><p>代码在执行过程中，会遇到一些无法立即处理的任务，比如：</p>
+<ul>
+<li>计时完成后需要执行的任务 —— <code>setTimeout</code>、<code>setInterval</code></li>
+<li>网络通信完成后需要执行的任务 – <code>XHR</code>、<code>Fetch</code></li>
+<li>用户操作后需要执行的任务 – <code>addEventListener</code></li>
+</ul>
+<p>如果让渲染主线程等待这些任务的时机达到，就会导致主线程长期处于「阻塞」的状态，从而导致浏览器「卡死」</p>
+<p><img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208101043348.png" alt="image-20220810104344296"></p>
+<p><strong>渲染主线程承担着极其重要的工作，无论如何都不能阻塞！</strong></p>
+<p>因此，浏览器选择<strong>异步</strong>来解决这个问题</p>
+<p><img src="/2023/09/26/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/202208101048899.png" alt="image-20220810104858857"></p>
+<p>使用异步的方式，<strong>渲染主线程永不阻塞</strong></p>
+<blockquote>
+<p>面试题：如何理解 JS 的异步？</p>
+<p>参考答案：</p>
+<p>JS 是一门单线程的语言，这是因为它运行在浏览器的渲染主线程中，而渲染主线程只有一个。</p>
+<p>而渲染主线程承担着诸多的工作，渲染页面、执行 JS 都在其中运行。</p>
+<p>如果使用同步的方式，就极有可能导致主线程产生阻塞，从而导致消息队列中的很多其他任务无法得到执行。这样一来，一方面会导致繁忙的主线程白白的消耗时间，另一方面导致页面无法及时更新，给用户造成卡死现象。</p>
+<p>所以浏览器采用异步的方式来避免。具体做法是当某些任务发生时，比如计时器、网络、事件监听，主线程将任务交给其他线程去处理，自身立即结束任务的执行，转而执行后续代码。当其他线程完成时，将事先传递的回调函数包装成任务，加入到消息队列的末尾排队，等待主线程调度执行。</p>
+<p>在这种异步模式下，浏览器永不阻塞，从而最大限度的保证了单线程的流畅运行。</p>
+</blockquote>
+<h3 id="JS-为何会阻碍渲染？"><a href="#JS-为何会阻碍渲染？" class="headerlink" title="JS 为何会阻碍渲染？"></a>JS 为何会阻碍渲染？</h3><p>先看代码</p>
+<pre class="line-numbers language-markup" data-language="markup"><code class="language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h1</span><span class="token punctuation">></span></span>Mr.Yuan is awesome!<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h1</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>button</span><span class="token punctuation">></span></span>change<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">var</span> h1 <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"h1"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">var</span> btn <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">"button"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 死循环指定的时间</span>
+  <span class="token keyword">function</span> <span class="token function">delay</span><span class="token punctuation">(</span><span class="token parameter">duration</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">var</span> start <span class="token operator">=</span> Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>Date<span class="token punctuation">.</span><span class="token function">now</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> start <span class="token operator">&lt;</span> duration<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+  <span class="token punctuation">&#125;</span>
+
+  btn<span class="token punctuation">.</span><span class="token function-variable function">onclick</span> <span class="token operator">=</span> <span class="token keyword">function</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    h1<span class="token punctuation">.</span>textContent <span class="token operator">=</span> <span class="token string">"XXX很帅！"</span><span class="token punctuation">;</span>
+    <span class="token function">delay</span><span class="token punctuation">(</span><span class="token number">3000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>点击按钮后，会发生什么呢？</p>
+<p>&lt;见具体演示&gt;</p>
+<h3 id="任务有优先级吗？"><a href="#任务有优先级吗？" class="headerlink" title="任务有优先级吗？"></a>任务有优先级吗？</h3><p>任务没有优先级，在消息队列中先进先出</p>
+<p>但<strong>消息队列是有优先级的</strong></p>
+<p>根据 W3C 的最新解释:</p>
+<ul>
+<li>每个任务都有一个任务类型，同一个类型的任务必须在一个队列，不同类型的任务可以分属于不同的队列。<br>在一次事件循环中，浏览器可以根据实际情况从不同的队列中取出任务执行。</li>
+<li>浏览器必须准备好一个微队列，微队列中的任务优先所有其他任务执行<br><a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint</a></li>
+</ul>
+<blockquote>
+<p>随着浏览器的复杂度急剧提升，W3C 不再使用宏队列的说法</p>
+</blockquote>
+<p>在目前 chrome 的实现中，至少包含了下面的队列：</p>
+<ul>
+<li>延时队列：用于存放计时器到达后的回调任务，优先级「中」</li>
+<li>交互队列：用于存放用户操作后产生的事件处理任务，优先级「高」</li>
+<li>微队列：用户存放需要最快执行的任务，优先级「最高」</li>
+</ul>
+<blockquote>
+<p>添加任务到微队列的主要方式主要是使用 Promise、MutationObserver</p>
+<p>例如：</p>
+<pre class="line-numbers language-javascript" data-language="javascript"><code class="language-javascript"><span class="token comment">// 立即把一个函数添加到微队列</span>
+Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>函数<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+</blockquote>
+<blockquote>
+<p>浏览器还有很多其他的队列，由于和我们开发关系不大，不作考虑</p>
+</blockquote>
+<blockquote>
+<p>面试题：阐述一下 JS 的事件循环</p>
+<p>参考答案：</p>
+<p>事件循环又叫做消息循环，是浏览器渲染主线程的工作方式。</p>
+<p>在 Chrome 的源码中，它开启一个不会结束的 for 循环，每次循环从消息队列中取出第一个任务执行，而其他线程只需要在合适的时候将任务加入到队列末尾即可。</p>
+<p>过去把消息队列简单分为宏队列和微队列，这种说法目前已无法满足复杂的浏览器环境，取而代之的是一种更加灵活多变的处理方式。</p>
+<p>根据 W3C 官方的解释，每个任务有不同的类型，同类型的任务必须在同一个队列，不同的任务可以属于不同的队列。不同任务队列有不同的优先级，在一次事件循环中，由浏览器自行决定取哪一个队列的任务。但浏览器必须有一个微队列，微队列的任务一定具有最高的优先级，必须优先调度执行。</p>
+</blockquote>
+<blockquote>
+<p>面试题：JS 中的计时器能做到精确计时吗？为什么？</p>
+<p>参考答案：</p>
+<p>不行，因为：</p>
+<ol>
+<li>计算机硬件没有原子钟，无法做到精确计时</li>
+<li>操作系统的计时函数本身就有少量偏差，由于 JS 的计时器最终调用的是操作系统的函数，也就携带了这些偏差</li>
+<li>按照 W3C 的标准，浏览器实现计时器时，如果嵌套层级超过 5 层，则会带有 4 毫秒的最少时间，这样在计时时间少于 4 毫秒时又带来了偏差</li>
+<li>受事件循环的影响，计时器的回调函数只能在主线程空闲时运行，因此又带来了偏差</li>
+</ol>
+</blockquote>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>html</category>
+      </categories>
+      <tags>
+        <tag>前端</tag>
+        <tag>浏览器</tag>
+      </tags>
+  </entry>
+</search>
